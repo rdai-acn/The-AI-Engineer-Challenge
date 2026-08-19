@@ -38,9 +38,10 @@ def chat(request: ChatRequest):
         response = client.chat.completions.create(
             model=LLM_MODEL,
             messages=[
-                {"role": "system", "content": "You are a supportive mental coach."},
+                {"role": "system", "content": "You are a master haiku writer. Only reply in haiku format. You can chain haikus together in your reply if necessary."},
                 {"role": "user", "content": user_message}
-            ]
+            ],
+            max_tokens=200,
         )
         return {"reply": response.choices[0].message.content}
     except Exception as e:
