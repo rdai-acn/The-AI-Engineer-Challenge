@@ -34,20 +34,16 @@ export async function POST(req: NextRequest) {
 
     if (!res.ok) {
       const detail = await res.text().catch(() => '')
-      console.log('[v0] Backend responded with error:', res.status, detail)
-      return NextResponse.json(
-        { error: 'The coach is unavailable right now. Please try again in a moment.' },
-        { status: 502 },
-      )
+      console.log('[chat] Backend responded with error:', res.status, detail)
+      // Backend is reachable but the LLM call failed — provider issue.
+      return NextResponse.json({ errorCode: 'llm_unavailable' }, { status: 502 })
     }
 
     const data = await res.json()
     return NextResponse.json({ reply: data.reply ?? '' })
   } catch (error) {
-    console.log('[v0] Failed to reach backend:', error instanceof Error ? error.message : error)
-    return NextResponse.json(
-      { error: 'Could not reach the coaching service. Check that the backend is running.' },
-      { status: 502 },
-    )
+    console.log('[chat] Failed to reach backend:', error instanceof Error ? error.message : error)
+    // fetch() threw — backend is not up.
+    return NextResponse.json({ errorCode: 'backend_down' }, { status: 502 })
   }
 }

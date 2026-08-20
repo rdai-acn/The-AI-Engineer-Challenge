@@ -6,10 +6,10 @@ import { MessageBubble, TypingBubble } from './message-bubble'
 import { Composer } from './composer'
 
 const SUGGESTIONS = [
-  'I feel overwhelmed today',
-  'Help me quiet a restless mind',
-  'I am afraid of starting over',
-  'How do I sit with uncertainty?',
+  'Write me a haiku about spring rain',
+  'Capture the stillness of dawn',
+  'A haiku for autumn leaves falling',
+  'The ocean at night in three lines',
 ]
 
 function createId() {
@@ -44,7 +44,11 @@ export function ChatWindow() {
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data?.error ?? 'Something went wrong.')
+        const errorMessages: Record<string, string> = {
+          backend_down: 'The backend server is not running. Start the FastAPI server to continue.',
+          llm_unavailable: 'The AI model provider is unreachable. Qwen3.5 is a locally run model and cannot be reached remotely.',
+        }
+        throw new Error(errorMessages[data?.errorCode] ?? data?.error ?? 'Something went wrong.')
       }
 
       setMessages((prev) => [
